@@ -71,6 +71,80 @@ public class CaseRuntimeDataServiceImplTest extends AbstractCaseServicesBaseTest
      * Case instance queries
      */
     @Test
+    public void testGetCaseInstancesWithPagination() {
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", "my first case");
+//        CaseFileInstance caseFile = caseService.newCaseFileInstance(deploymentUnit.getIdentifier(), EMPTY_CASE_P_ID, data);
+//
+        //String caseId = caseService.startCase(deploymentUnit.getIdentifier(), EMPTY_CASE_P_ID, caseFile);
+        
+        for (int i = 0 ; i < 10 ; i++) {
+        	data.put("case name" + i, "case" + i);
+        	CaseFileInstance caseFile = caseService.newCaseFileInstance(deploymentUnit.getIdentifier(), EMPTY_CASE_P_ID, data);
+        	caseService.startCase(deploymentUnit.getIdentifier(), EMPTY_CASE_P_ID, caseFile);
+        	data.clear();    	
+        }
+        
+        for (int i = 0 ; i < 10 ; i++) {
+        	data.put("case name" + i, "case" + i);
+        	CaseFileInstance caseFile = caseService.newCaseFileInstance(deploymentUnit.getIdentifier(), USER_TASK_STAGE_CASE_P_ID, data);
+        	caseService.startCase(deploymentUnit.getIdentifier(), USER_TASK_STAGE_CASE_P_ID, caseFile);
+        	data.clear();    	
+        }
+//        assertNotNull(caseId);
+//        assertEquals(FIRST_CASE_ID, caseId);
+//        try {
+//            CaseInstance cInstance = caseService.getCaseInstance(caseId, true, false, false, false);
+//            assertNotNull(cInstance);
+//            assertEquals(FIRST_CASE_ID, cInstance.getCaseId());
+//            assertNotNull(cInstance.getCaseFile());
+//            assertEquals("my first case", cInstance.getCaseFile().getData("name"));
+
+            Collection<CaseInstance> instances = caseRuntimeDataService.getCaseInstances(new QueryContext());
+            System.out.println("Instances:" + instances.size());
+//            assertNotNull(instances);
+//
+//            assertEquals(1, instances.size());
+//            CaseInstance instance = instances.iterator().next();
+//            assertNotNull(instance);
+//
+//            assertEquals(FIRST_CASE_ID, instance.getCaseId());
+//            assertEquals(EMPTY_CASE_P_ID, instance.getCaseDefinitionId());
+//            assertEquals("my first case", instance.getCaseDescription());
+//            assertEquals(USER, instance.getOwner());
+//            assertEquals(ProcessInstance.STATE_ACTIVE, instance.getStatus().intValue());
+//            assertEquals(deploymentUnit.getIdentifier(), instance.getDeploymentId());
+//            assertNotNull(instance.getStartedAt());
+//
+//            // add dynamic user task to empty case instance - first by case id
+//            Map<String, Object> parameters = new HashMap<>();
+//            caseService.addDynamicTask(FIRST_CASE_ID, caseService.newHumanTaskSpec("First task", "test", "john", null, parameters));
+//
+//            Collection<NodeInstanceDesc> activeNodes = caseRuntimeDataService.getActiveNodesForCase(FIRST_CASE_ID, new QueryContext());
+//            assertNotNull(activeNodes);
+//            assertEquals(1, activeNodes.size());
+//
+//            NodeInstanceDesc activeNode = activeNodes.iterator().next();
+//            assertNotNull(activeNodes);
+//            assertEquals("[Dynamic] First task", activeNode.getName());
+//
+//            List<TaskSummary> tasks = caseRuntimeDataService.getCaseTasksAssignedAsPotentialOwner(caseId, "john", null, new QueryContext());
+//            assertNotNull(tasks);
+//            assertEquals(1, tasks.size());
+//            TaskSummary task = tasks.get(0);
+//            assertEquals("First task", task.getName());
+//            assertEquals("test", task.getDescription());
+//        } catch (Exception e) {
+//            logger.error("Unexpected error {}", e.getMessage(), e);
+//            fail("Unexpected exception " + e.getMessage());
+//        } finally {
+//            if (caseId != null) {
+//                caseService.cancelCase(caseId);
+//            }
+//        }
+    }
+    
+    @Test
     public void testStartEmptyCaseWithCaseFile() {
         Map<String, Object> data = new HashMap<>();
         data.put("name", "my first case");
@@ -402,6 +476,27 @@ public class CaseRuntimeDataServiceImplTest extends AbstractCaseServicesBaseTest
                 caseService.cancelCase(caseId2);
             }
         }
+    }
+    
+    @Test
+    public void testGetProcessDefinitionsWithPagination() {   	
+    	int pageSize = 1;
+    	
+    	int firstPageOffset = 0 * pageSize;
+    	int secondPageOffset = 1 * pageSize;
+    	int thirdPageOffset = 3 * pageSize;
+    	
+        Collection<ProcessDefinition> firstPage = caseRuntimeDataService.getProcessDefinitions(new QueryContext(firstPageOffset, pageSize));
+        assertNotNull(firstPage);
+        assertEquals(1, firstPage.size());
+        
+        Collection<ProcessDefinition> secondPage = caseRuntimeDataService.getProcessDefinitions(new QueryContext(secondPageOffset, pageSize));
+        assertNotNull(secondPage);
+        assertEquals(1, secondPage.size());
+        
+        Collection<ProcessDefinition> thirdPage = caseRuntimeDataService.getProcessDefinitions(new QueryContext(thirdPageOffset, pageSize));
+        assertNotNull(thirdPage);
+        assertEquals(0, thirdPage.size());
     }
 
     @Test

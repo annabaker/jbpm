@@ -160,7 +160,7 @@ public class CaseRuntimeDataServiceDefinitionImplTest extends AbstractCaseServic
     }
     
     @Test
-    public void testGetCaseDefinitions_Pagination() {   	
+    public void testGetCaseDefinitionsWithPagination() {   	
     	int pageSize = 4;
     	
     	int firstPageOffset = 0 * pageSize;
@@ -173,7 +173,6 @@ public class CaseRuntimeDataServiceDefinitionImplTest extends AbstractCaseServic
         Collection<CaseDefinition> secondPage = caseRuntimeDataService.getCases(new QueryContext(secondPageOffset, pageSize));
         assertNotNull(secondPage);
         assertEquals(1, secondPage.size());
-
     }
 
     @Test
