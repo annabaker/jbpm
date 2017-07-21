@@ -158,6 +158,23 @@ public class CaseRuntimeDataServiceDefinitionImplTest extends AbstractCaseServic
         assertEquals(2, mappedRoles.get("contact").getCardinality().intValue());
         assertEquals(-1, mappedRoles.get("participant").getCardinality().intValue());
     }
+    
+    @Test
+    public void testGetCaseDefinitions_Pagination() {   	
+    	int pageSize = 4;
+    	
+    	int firstPageOffset = 0 * pageSize;
+    	int secondPageOffset = 1 * pageSize;
+    	
+        Collection<CaseDefinition> firstPage = caseRuntimeDataService.getCases(new QueryContext(firstPageOffset, pageSize));
+        assertNotNull(firstPage);
+        assertEquals(4, firstPage.size());
+        
+        Collection<CaseDefinition> secondPage = caseRuntimeDataService.getCases(new QueryContext(secondPageOffset, pageSize));
+        assertNotNull(secondPage);
+        assertEquals(1, secondPage.size());
+
+    }
 
     @Test
     public void testGetCaseDefinitionsSorted() {
