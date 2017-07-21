@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.jbpm.casemgmt.api.CaseNotFoundException;
 import org.jbpm.casemgmt.api.model.AdHocFragment;
+import org.jbpm.casemgmt.api.model.CaseDefinition;
 import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.jbpm.casemgmt.api.model.instance.CaseFileInstance;
 import org.jbpm.casemgmt.api.model.instance.CaseInstance;
@@ -809,5 +810,22 @@ public class CaseRuntimeDataServiceImplTest extends AbstractCaseServicesBaseTest
         assertTrue(testCaseStatusesFromNames.contains(CaseStatus.OPEN));
         assertTrue(testCaseStatusesFromNames.contains(CaseStatus.CLOSED));
         assertTrue(testCaseStatusesFromNames.contains(CaseStatus.CANCELLED));
+    }
+    
+    @Test
+    public void testGetCaseDefinitions_Pagination() {   	
+    	int pageSize = 4;
+    	
+    	int firstPageOffset = 0 * pageSize;
+    	int secondPageOffset = 1 * pageSize;
+    	
+        Collection<CaseDefinition> firstPage = caseRuntimeDataService.getCases(new QueryContext(firstPageOffset, pageSize));
+        assertNotNull(firstPage);
+        assertEquals(4, firstPage.size());
+        
+        Collection<CaseDefinition> secondPage = caseRuntimeDataService.getCases(new QueryContext(secondPageOffset, pageSize));
+        assertNotNull(secondPage);
+        assertEquals(2, secondPage.size());
+
     }
 }
