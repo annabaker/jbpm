@@ -403,8 +403,8 @@ public class CaseRuntimeDataServiceImpl implements CaseRuntimeDataService, Deplo
         params.put("caseId", caseId + "%");
         applyQueryContext(params, queryContext);
         applyDeploymentFilter(params);
-        List<org.jbpm.services.api.model.NodeInstanceDesc> nodeInstances =  commandService.execute(new QueryNameCommand<List<org.jbpm.services.api.model.NodeInstanceDesc>>("getActiveNodesForCase", params));
-        return nodeInstances;
+        List<org.jbpm.services.api.model.NodeInstanceDesc> nodeInstances =  commandService.execute(new QueryNameCommand<List<org.jbpm.services.api.model.NodeInstanceDesc>>("getActiveNodesForCase", params));        
+        return applyPagination(nodeInstances, queryContext);
     }
     
     @Override

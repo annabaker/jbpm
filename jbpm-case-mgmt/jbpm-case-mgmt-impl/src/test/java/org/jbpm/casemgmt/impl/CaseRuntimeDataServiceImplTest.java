@@ -525,6 +525,86 @@ public class CaseRuntimeDataServiceImplTest extends AbstractCaseServicesBaseTest
         assertTrue(mappedProcesses.containsKey("UserTask"));
         assertTrue(mappedProcesses.containsKey("DataVerification"));
     }
+    
+    @Test
+    public void testGetActiveNodesForCaseWithPagination() {
+        Map<String, OrganizationalEntity> roleAssignments = new HashMap<>();
+        roleAssignments.put("owner", new UserImpl(USER));
+
+        Map<String, Object> data = new HashMap<>();
+        //CaseFileInstance caseFile1 = caseService.newCaseFileInstance(deploymentUnit.getIdentifier(), TWO_STAGES_CASE_P_ID, data, roleAssignments);
+       
+//        CaseFileInstance caseFile5 = caseService.newCaseFileInstance(deploymentUnit.getIdentifier(), USER_TASK_STAGE_AUTO_START_CASE_P_ID, data, roleAssignments);
+//        CaseFileInstance caseFile6 = caseService.newCaseFileInstance(deploymentUnit.getIdentifier(), USER_TASK_STAGE_ADHOC_CASE_P_ID, data, roleAssignments);
+//        CaseFileInstance caseFile7 = caseService.newCaseFileInstance(deploymentUnit.getIdentifier(), NO_START_NODE_CASE_P_ID, data, roleAssignments);
+//        CaseFileInstance caseFile8 = caseService.newCaseFileInstance(deploymentUnit.getIdentifier(), COND_CASE_P_ID, data, roleAssignments);
+//        CaseFileInstance caseFile1 = caseService.newCaseFileInstance(deploymentUnit.getIdentifier(), TWO_STAGES_CONDITIONS_CASE_P_ID, data, roleAssignments);
+//       CaseFileInstance caseFile1 = caseService.newCaseFileInstance(deploymentUnit.getIdentifier(), TWO_STAGES_CONDITIONS_CASE_P_ID, data, roleAssignments);
+//      
+        String caseId1 = caseService.startCase(deploymentUnit.getIdentifier(), TWO_STAGES_CONDITIONS_CASE_P_ID, caseFile1);
+
+
+        Collection<NodeInstanceDesc> activeNodes1 = caseRuntimeDataService.getActiveNodesForCase(caseId1, new QueryContext(0, 10));
+
+        
+        System.out.println("ACTIVE NODES: " + activeNodes1.size());
+        
+        
+//        assertNotNull(caseId);
+//        try {
+//
+//            Collection<CaseStageInstance> stage = caseRuntimeDataService.getCaseInstanceStages(caseId, true, new QueryContext(0, 1));
+//            assertNotNull(stage);
+//            assertEquals(1, stage.size());
+//            assertEquals("Stage One", stage.iterator().next().getName());
+//            assertEquals(StageStatus.Active, stage.iterator().next().getStatus());
+//
+//            Collection<AdHocFragment> adhocTasks = caseRuntimeDataService.getAdHocFragmentsForCase(caseId);
+//            assertNotNull(adhocTasks);
+//            assertEquals(1, adhocTasks.size());
+//            assertEquals("Task 1", adhocTasks.iterator().next().getName());
+//
+//            
+//            Collection<NodeInstanceDesc> activeNodes = caseRuntimeDataService.getActiveNodesForCase(caseId, new QueryContext(0, 10));
+//            assertNotNull(activeNodes);
+//            assertEquals(1, activeNodes.size());
+//            assertEquals("Stage One", activeNodes.iterator().next().getName());
+//
+//            Collection<NodeInstanceDesc> completedNodes = caseRuntimeDataService.getCompletedNodesForCase(caseId, new QueryContext(0, 10));
+//            assertNotNull(completedNodes);
+//            assertEquals(0, completedNodes.size());
+//
+//            caseService.addDataToCaseFile(caseId, "customData", "nextStagePlease");
+//
+//            stage = caseRuntimeDataService.getCaseInstanceStages(caseId, true, new QueryContext(0, 1));
+//            assertNotNull(stage);
+//            assertEquals(1, stage.size());
+//            assertEquals("Stage Two", stage.iterator().next().getName());
+//            assertEquals(StageStatus.Active, stage.iterator().next().getStatus());
+//
+//            adhocTasks = caseRuntimeDataService.getAdHocFragmentsForCase(caseId);
+//            assertNotNull(adhocTasks);
+//            assertEquals(1, adhocTasks.size());
+//            assertEquals("Task 2", adhocTasks.iterator().next().getName());
+//
+//            activeNodes = caseRuntimeDataService.getActiveNodesForCase(caseId, new QueryContext(0, 10));
+//            assertNotNull(activeNodes);
+//            assertEquals(1, activeNodes.size());
+//            assertEquals("Stage Two", activeNodes.iterator().next().getName());
+//
+//            completedNodes = caseRuntimeDataService.getCompletedNodesForCase(caseId, new QueryContext(0, 10));
+//            assertNotNull(completedNodes);
+//            assertEquals(1, completedNodes.size());
+//            assertEquals("Stage One", completedNodes.iterator().next().getName());
+//        } catch (Exception e) {
+//            logger.error("Unexpected error {}", e.getMessage(), e);
+//            fail("Unexpected exception " + e.getMessage());
+//        } finally {
+//            if (caseId != null) {
+//                caseService.cancelCase(caseId);
+//            }
+//        }
+    }
 
     @Test
     public void testTransitionBetweenStagesInCase() {
