@@ -1,11 +1,11 @@
-/**
- * Copyright 2010 Red Hat, Inc. and/or its affiliates.
+/*
+ * Copyright 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -824,6 +824,35 @@ public abstract class HTWorkItemHandlerBaseTest extends AbstractBaseTest {
         final String actualOwner = (String) manager.getResults().get("ActorId");
         assertNotNull(actualOwner);
         assertEquals("Darth Vader", actualOwner);
+    }
+    
+    @Test
+    public void testTaskExitByCustomBusinessAdmin() throws Exception {
+        TestWorkItemManager manager = new TestWorkItemManager();
+        ksession.setWorkItemManager(manager);
+        WorkItemImpl workItem = new WorkItemImpl();
+        workItem.setName("Human Task");
+        workItem.setParameter("NodeName", "TaskName");
+        workItem.setParameter("Comment", "Comment");
+        workItem.setParameter("Priority", "10");
+        workItem.setParameter("ActorId", "Darth Vader");
+        workItem.setParameter("BusinessAdministratorId", "Luke Cage");
+        workItem.setProcessInstanceId(10);
+        getHandler().executeWorkItem(workItem, manager);
+        
+        Task task = taskService.getTaskByWorkItemId(workItem.getId());
+        assertNotNull(task);
+        
+        getHandler().abortWorkItem(workItem, manager);
+        
+        task = taskService.getTaskByWorkItemId(workItem.getId());
+        assertEquals("TaskName", task.getNames().get(0).getText());
+        assertEquals(10, task.getPriority().intValue());
+        assertEquals("Comment", task.getDescriptions().get(0).getText());
+        assertEquals(Status.Exited, task.getTaskData().getStatus());
+        
+        List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwner("Darth Vader", "en-UK");
+        assertEquals(0, tasks.size());
     }
 
     private WorkItemImpl prepareWorkItemWithTaskVariables(final String taskDescriptionParam) {
