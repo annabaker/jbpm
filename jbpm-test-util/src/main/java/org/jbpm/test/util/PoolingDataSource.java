@@ -61,9 +61,22 @@ public class PoolingDataSource implements DataSource {
 
     public void init()  {
         try {
-            xads = (XADataSource)Class.forName(className).newInstance();
+            xads = (XADataSource) Class.forName(className).newInstance();
             String url = driverProperties.getProperty("url", driverProperties.getProperty("URL"));
-            xads.getClass().getMethod("setURL", new Class[] {String.class}).invoke(xads, new Object[] {url});
+            logger.info(url);
+            if (!(className.startsWith("com.ibm.db2") || className.startsWith("com.sybase"))) {
+                try {
+                    xads.getClass().getMethod("setUrl", new Class[]{String.class}).invoke(xads, url);
+                } catch (NoSuchMethodException ex) {
+                    logger.info("Unable to find \"setUrl\" method in db driver JAR. Trying \"setURL\" ");
+                    xads.getClass().getMethod("setURL", new Class[]{String.class}).invoke(xads, url);
+                } catch (InvocationTargetException ex) {
+                    logger.info("Driver does not support setURL and setUrl method.");
+                    throw new RuntimeException(ex);
+                }
+            } else {
+                setupAdditionalDriverProperties(className);
+            }
             
             try {
                 InitialContext initContext = new InitialContext();
@@ -108,7 +121,7 @@ public class PoolingDataSource implements DataSource {
         if (driverProperties.getProperty("user") != null) {
             return getConnection(driverProperties.getProperty("user"), driverProperties.getProperty("password"));
         } else {
-            Properties properties = new Properties();
+            Properties properties = getDriverProperties();
             properties.put(TransactionalDriver.XADataSource, this.xads);
             return transactionalDriver.connect("jdbc:arjuna:" + uniqueName, properties);
         }
@@ -116,7 +129,7 @@ public class PoolingDataSource implements DataSource {
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        Properties properties = new Properties();
+        Properties properties = getDriverProperties();
         properties.put(TransactionalDriver.XADataSource, this.xads);
         properties.put(TransactionalDriver.userName, username);
         if (password != null) {
@@ -159,5 +172,25 @@ public class PoolingDataSource implements DataSource {
     @Override
     public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
         return null;
+    }
+
+    private void setupAdditionalDriverProperties(String className) {
+        try {
+            xads.getClass().getMethod("setServerName", new Class[]{String.class}).invoke(xads, driverProperties.getProperty("serverName"));
+            xads.getClass().getMethod("setDatabaseName", new Class[]{String.class}).invoke(xads, driverProperties.getProperty("databaseName"));
+            if (className.startsWith("com.ibm.db2")) {
+                xads.getClass().getMethod("setDriverType", new Class[]{int.class}).invoke(xads, 4);
+                xads.getClass().getMethod("setPortNumber", new Class[]{int.class}).invoke(xads, Integer.valueOf(driverProperties.getProperty("portNumber")));
+                xads.getClass().getMethod("setResultSetHoldability", new Class[]{int.class}).invoke(xads, 1);
+                xads.getClass().getMethod("setDowngradeHoldCursorsUnderXa", new Class[]{boolean.class}).invoke(xads, true);
+            } else if (className.startsWith("com.sybase")) {
+                xads.getClass().getMethod("setPortNumber", new Class[]{int.class}).invoke(xads,  Integer.valueOf(driverProperties.getProperty("portNumber")));
+                xads.getClass().getMethod("setPassword", new Class[]{String.class}).invoke(xads, driverProperties.getProperty("password"));
+                xads.getClass().getMethod("setUser", new Class[]{String.class}).invoke(xads, driverProperties.getProperty("user"));
+            }
+        } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException ex) {
+            logger.error("Exception thrown while setting properties for {} driver", className);
+            throw new RuntimeException(ex);
+        }
     }
 }
